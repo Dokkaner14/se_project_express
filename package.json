@@ -1,0 +1,15 @@
+{
+  "name": "se_project_express-main",
+  "version": "0.1.0",
+  "description": "express project",
+  "license": "ISC",
+  "author": "Jose Soto",
+  "type": "commonjs",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
