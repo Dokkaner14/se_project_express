@@ -1,39 +1,50 @@
-const ClothingItem = require("../models/clothingItem");
+const ClothingItem = require("../models/clothingitem");
+const {
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
+} = require("../utils/errors");
+
+const handleError = (res, err) => {
+  if (err.name === "ValidationError" || err.name === "CastError") {
+    return res.status(BAD_REQUEST).send({ message: err.message });
+  }
+
+  if (err.name === "DocumentNotFoundError") {
+    return res.status(NOT_FOUND).send({ message: err.message });
+  }
+
+  return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+};
 
 const createItem = (req, res) => {
   console.log(req);
   console.log(req.body);
 
-  const { name, weather, imageURL } = req.body;
+  const { name, weather, imageUrl } = req.body;
 
-  ClothingItem.create({ name, weather, imageURL })
+  ClothingItem.create({ name, weather, imageUrl, owner: req.user._id })
     .then((item) => {
       console.log(item);
-      res.send({ data: item });
+      res.status(201).send({ data: item });
     })
-    .catch((e) => {
-      res.status(500).send({ message: "Error from createItem", e });
-    });
+    .catch((e) => handleError(res, e));
 };
 
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(200).send(items))
-    .catch((e) => {
-      res.status(500).send({ message: "Error from getItems", e });
-    });
+    .catch((e) => handleError(res, e));
 };
 
 const updateItem = (req, res) => {
   const { itemId } = req.params;
-  const { imageURL } = req.body;
+  const { imageUrl } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } }, { new: true })
+  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageUrl } }, { new: true })
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((e) => {
-      res.status(500).send({ message: "Error from updatetItems", e });
-    });
+    .catch((e) => handleError(res, e));
 };
 
 const likeItem = (req, res) => {
@@ -47,9 +58,7 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((e) => {
-      res.status(500).send({ message: "Error from likeItem", e });
-    });
+    .catch((e) => handleError(res, e));
 };
 
 const dislikeItem = (req, res) => {
@@ -63,9 +72,7 @@ const dislikeItem = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
-    .catch((e) => {
-      res.status(500).send({ message: "Error from dislikeItem", e });
-    });
+    .catch((e) => handleError(res, e));
 };
 
 const deleteItem = (req, res) => {
@@ -73,9 +80,7 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => res.status(204).send({}))
-    .catch((e) => {
-      res.status(500).send({ message: "Error from deletetItem", e });
-    });
+    .catch((e) => handleError(res, e));
 };
 
 module.exports = {
