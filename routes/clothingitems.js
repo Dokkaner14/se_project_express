@@ -3,6 +3,8 @@ const {
   createItem,
   getItems,
   updateItem,
+  likeItem,
+  dislikeItem,
   deleteItem,
 } = require("../controllers/clothingItems");
 
@@ -17,10 +19,12 @@ router.get("/", getItems);
 
 //  Update
 
-router.put("/itemId", updateItem);
+router.put("/:itemId", updateItem);
+router.put("/:itemId/likes", likeItem);
 
 //  Delete
 
-router.delete("/itemId", deleteItem);
+router.delete("/:itemId", deleteItem);
+router.delete("/:itemId/likes", dislikeItem);
 
 module.exports = router;

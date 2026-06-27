@@ -28,7 +28,7 @@ const updateItem = (req, res) => {
   const { itemId } = req.params;
   const { imageURL } = req.body;
 
-  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } })
+  ClothingItem.findByIdAndUpdate(itemId, { $set: { imageURL } }, { new: true })
     .orFail()
     .then((item) => res.status(200).send({ data: item }))
     .catch((e) => {
@@ -36,10 +36,41 @@ const updateItem = (req, res) => {
     });
 };
 
+const likeItem = (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user._id;
+
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $addToSet: { likes: userId } },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((e) => {
+      res.status(500).send({ message: "Error from likeItem", e });
+    });
+};
+
+const dislikeItem = (req, res) => {
+  const { itemId } = req.params;
+  const userId = req.user._id;
+
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $pull: { likes: userId } },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(200).send({ data: item }))
+    .catch((e) => {
+      res.status(500).send({ message: "Error from dislikeItem", e });
+    });
+};
+
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-  clothingItem
-    .findByIdAndDelete(itemId)
+  ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     .then((item) => res.status(204).send({}))
     .catch((e) => {
@@ -51,5 +82,7 @@ module.exports = {
   createItem,
   getItems,
   updateItem,
+  likeItem,
+  dislikeItem,
   deleteItem,
 };
