@@ -14,7 +14,9 @@ const handleError = (res, err) => {
     return res.status(NOT_FOUND).send({ message: err.message });
   }
 
-  return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+  return res
+    .status(INTERNAL_SERVER_ERROR)
+    .send({ message: "An error has occurred on the server" });
 };
 
 const createItem = (req, res) => {
