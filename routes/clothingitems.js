@@ -1,11 +1,6 @@
 const router = require("express").Router();
-const {
-  createItem,
-  getItems,
-  likeItem,
-  dislikeItem,
-  deleteItem,
-} = require("../controllers/clothingitems");
+const { createItem, getItems, likeItem, dislikeItem, deleteItem } =
+  require("../controllers/clothingItems").default;
 
 // CRUD SECTION //
 

@@ -1,4 +1,4 @@
-const ClothingItem = require("../models/clothingitem");
+const ClothingItem = require("../models/clothingItem");
 const {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
@@ -79,6 +79,7 @@ const deleteItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
+    // eslint-disable-next-line no-unused-vars
     .then((item) => res.status(204).send({}))
     .catch((e) => handleError(res, e));
 };
