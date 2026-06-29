@@ -7,7 +7,7 @@ const {
   deleteItem,
 } = require("../controllers/clothingItems");
 
-// CRUD SECTION //
+// CRUD SECTION
 
 // CREATE
 router.post("/", createItem);

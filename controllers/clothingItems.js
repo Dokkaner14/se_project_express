@@ -82,7 +82,7 @@ const deleteItem = (req, res) => {
   ClothingItem.findByIdAndDelete(itemId)
     .orFail()
     // eslint-disable-next-line no-unused-vars
-    .then((item) => res.status(204).send({}))
+    .then((item) => res.status(200).send({ data: item }))
     .catch((e) => handleError(res, e));
 };
 
