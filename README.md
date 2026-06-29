@@ -1,9 +1,49 @@
-# WTWR (What to Wear?): Back End
-The back-end project is focused on creating a server for the WTWR application. You’ll gain a deeper understanding of how to work with databases, set up security and testing, and deploy web applications on a remote machine. The eventual goal is to create a server with an API and user authorization.
+# WTWR Backend
+
+This project is the backend for the WTWR (What to Wear?) application. It handles storing and managing users and clothing items through a REST API connected to MongoDB.
+
+The server allows users to:
+
+- create and view user profiles
+- add clothing items
+- delete clothing items
+- like and unlike items
+- retrieve users and clothing data from the database
+
+## Main Routes
+
+### Users
+
+- `GET /users` — returns all users
+- `GET /users/:userId` — returns a user by ID
+- `POST /users` — creates a new user
+
+### Clothing Items
+
+- `GET /items` — returns all clothing items
+- `GET /items/:itemId` — returns a clothing item by ID
+- `POST /items` — creates a new clothing item
+- `DELETE /items/:itemId` — deletes a clothing item
+- `PUT /items/:itemId/likes` — likes an item
+- `DELETE /items/:itemId/likes` — removes a like from an item
+
+## Technologies Used
+
+This project was built using:
+
+- Node.js
+- Express.js
+- MongoDB
+- Mongoose
+- ESLint
+- Nodemon
+- Validator.js
+
 ## Running the Project
-`npm run start` — to launch the server 
 
-`npm run dev` — to launch the server with the hot reload feature
+```bash
+npm install
+npm run dev
+```
 
-### Testing
-Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+The routes and error handling were tested using Postman.
