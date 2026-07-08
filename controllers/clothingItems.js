@@ -3,6 +3,7 @@ const {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   NOT_FOUND,
+  FORBIDDEN,
 } = require("../utils/errors");
 
 const handleError = (res, err) => {
@@ -79,10 +80,19 @@ const dislikeItem = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
-  ClothingItem.findByIdAndDelete(itemId)
+  const userId = req.user && req.user._id;
+  ClothingItem.findById(itemId)
     .orFail()
-    // eslint-disable-next-line no-unused-vars
-    .then((item) => res.status(200).send({ data: item }))
+    .then((item) => {
+      if (item.owner.toString() !== String(userId)) {
+        return res
+          .status(FORBIDDEN)
+          .send({ message: "You do not have permission to delete this item" });
+      }
+      return ClothingItem.findByIdAndDelete(itemId).then((deleted) =>
+        res.status(200).send({ data: deleted })
+      );
+    })
     .catch((e) => handleError(res, e));
 };
 
