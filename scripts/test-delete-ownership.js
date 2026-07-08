@@ -1,6 +1,6 @@
 (async () => {
   const base = "http://localhost:3001";
-  const fetch = globalThis.fetch;
+  const {fetch} = globalThis;
 
   async function signin(email, password) {
     const res = await fetch(`${base}/signin`, {
