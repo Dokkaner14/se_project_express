@@ -1,12 +1,5 @@
 const router = require("express").Router();
-const {
-  getCurrentUser,
-  updateCurrentUser,
-  login,
-} = require("../controllers/users");
-
-// Public auth route
-router.post("/login", login);
+const { getCurrentUser, updateCurrentUser } = require("../controllers/users");
 
 // Return current user
 router.get("/me", getCurrentUser);

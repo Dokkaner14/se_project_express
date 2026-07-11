@@ -14,9 +14,6 @@ module.exports = (req, res, next) => {
 
   const { authorization } = req.headers;
   if (!authorization) {
-    if (req.user && req.user._id) {
-      return next();
-    }
     return res.status(UNAUTHORIZED).send({ message: "Authorization required" });
   }
 
