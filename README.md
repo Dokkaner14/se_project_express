@@ -39,6 +39,10 @@ This project was built using:
 - Nodemon
 - Validator.js
 
+## link to project pitch video
+
+- https://www.loom.com/share/81cd567f2baf4d589565032c03b729b5
+
 ## Running the Project
 
 ```bash
