@@ -1,10 +1,11 @@
+"use strict";
+
 module.exports = {
   env: {
     es2021: true,
     node: true,
   },
-
-  // Add the necessary extensions.
+  plugins: ["import"],
   extends: ["eslint:recommended", "airbnb-base", "prettier"],
   overrides: [
     {
