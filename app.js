@@ -1,7 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { errors } = require("celebrate"); // ← add this
+const { errors } = require("celebrate");
 const mainRouter = require("./routes/index");
 const auth = require("./middlewares/auth");
 const errorHandler = require("./middlewares/error-handler");
