@@ -44,6 +44,14 @@ PM2
 NGINX
 Certbot/SSL
 
+## link to back end
+
+https://github.com/Dokkaner14/se_project_express
+
+## link to the front end
+
+https://github.com/Dokkaner14/se_project_react
+
 ## link to project pitch video
 
 - https://www.loom.com/share/bae1c0bef54e4b99a024a0ccf402c391
