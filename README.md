@@ -60,7 +60,7 @@ https://github.com/Dokkaner14/se_project_react
 
 ```bash
 npm install
-npm run dev
+npm run start
 ```
 
 The routes and error handling were tested using Postman.
