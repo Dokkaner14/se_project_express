@@ -31,17 +31,22 @@ The server allows users to:
 
 This project was built using:
 
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- ESLint
-- Nodemon
-- Validator.js
+Node.js
+Express.js
+MongoDB
+Mongoose
+ESLint
+Nodemon
+Validator.js
+Celebrate/Joi
+Winston
+PM2
+NGINX
+Certbot/SSL
 
 ## link to project pitch video
 
-- https://www.loom.com/share/81cd567f2baf4d589565032c03b729b5
+- https://www.loom.com/share/bae1c0bef54e4b99a024a0ccf402c391
 
 ## Running the Project
 
