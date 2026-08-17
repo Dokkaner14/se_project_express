@@ -4,12 +4,10 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const express = require("express");
 const { errors } = require("celebrate");
-
 const usersRouter = require("./routes/users");
 const clothingItemsRouter = require("./routes/clothingItems");
 const { createUser, login } = require("./controllers/users");
 const { validateUserBody, validateLogin } = require("./middlewares/validation");
-
 const NotFoundError = require("./errors/NotFoundError");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
