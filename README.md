@@ -56,6 +56,10 @@ https://github.com/Dokkaner14/se_project_react
 
 - https://www.loom.com/share/bae1c0bef54e4b99a024a0ccf402c391
 
+## sub domain link
+
+https://fitcheck.turvip.net/
+
 ## Running the Project
 
 ```bash
