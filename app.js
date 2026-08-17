@@ -1,22 +1,38 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
-const { errors } = require("celebrate");
-const mainRouter = require("./routes/index");
-const auth = require("./middlewares/auth");
-const errorHandler = require("./middlewares/error-handler");
-const { requestLogger, errorLogger } = require("./middlewares/logger");
 require("dotenv").config();
 
+const cors = require("cors");
+const mongoose = require("mongoose");
+const express = require("express");
+const { errors } = require("celebrate");
+
+const usersRouter = require("./routes/users");
+const clothingItemsRouter = require("./routes/clothingItems");
+const { createUser, login } = require("./controllers/users");
+const { validateUserBody, validateLogin } = require("./middlewares/validation");
+
+const NotFoundError = require("./errors/NotFoundError");
+const errorHandler = require("./middlewares/error-handler");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
+
 const app = express();
-const { PORT = 3001 } = process.env;
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {
-    console.log("connected to DB");
-  })
-  .catch(console.error);
+  .then(() => console.log("Connected to MongoDB"))
+  .catch((err) => console.log(err));
+
+app.use(express.json());
+app.use(cors());
+
+app.use(requestLogger);
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: "5d8b8592978f8bd833ca8133",
+  };
+
+  next();
+});
 
 app.get("/crash-test", () => {
   setTimeout(() => {
@@ -24,19 +40,24 @@ app.get("/crash-test", () => {
   }, 0);
 });
 
-// --- middleware (order matters) ---
-app.use(cors());
-app.use(express.json());
-app.use(requestLogger); // log every incoming request
+app.post("/signup", validateUserBody, createUser);
+app.post("/signin", validateLogin, login);
 
-app.use(auth); // your auth middleware
-app.use("/", mainRouter); // routes
+app.use("/users", usersRouter);
+app.use("/items", clothingItemsRouter);
 
-app.use(errorLogger); // log errors that reach here
-app.use(errors()); // celebrate validation errors
-app.use(errorHandler); // your centralized error handler
+const PORT = 3001;
 
-// --- start server ---
+app.use((req, res, next) => {
+  next(new NotFoundError("Requested resource not found"));
+});
+
+app.use(errorLogger);
+
+app.use(errors());
+
+app.use(errorHandler);
+
 app.listen(PORT, () => {
-  console.log(`Listening on ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
