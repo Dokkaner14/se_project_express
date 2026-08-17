@@ -4,11 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const express = require("express");
 const { errors } = require("celebrate");
-const usersRouter = require("./routes/users");
-const clothingItemsRouter = require("./routes/clothingItems");
-const { createUser, login } = require("./controllers/users");
-const { validateUserBody, validateLogin } = require("./middlewares/validation");
-const NotFoundError = require("./errors/NotFoundError");
+const indexRouter = require("./routes/index");
 const errorHandler = require("./middlewares/error-handler");
 const { requestLogger, errorLogger } = require("./middlewares/logger");
 
@@ -30,17 +26,9 @@ app.get("/crash-test", () => {
   }, 0);
 });
 
-app.post("/signup", validateUserBody, createUser);
-app.post("/signin", validateLogin, login);
-
-app.use("/users", usersRouter);
-app.use("/items", clothingItemsRouter);
+app.use(indexRouter);
 
 const PORT = 3001;
-
-app.use((req, res, next) => {
-  next(new NotFoundError("Requested resource not found"));
-});
 
 app.use(errorLogger);
 

@@ -8,124 +8,114 @@ const UnauthorizedError = require("../errors/UnauthorizedError");
 const NotFoundError = require("../errors/NotFoundError");
 const ConflictError = require("../errors/ConflictError");
 
-const getUsers = (req, res, next) => {
+const handleUserError = (err, next) => {
+  if (err.code === 11000) {
+    next(new ConflictError("Email already exists"));
+  } else if (err.name === "ValidationError") {
+    next(new BadRequestError("Invalid data passed"));
+  } else if (err.name === "CastError") {
+    next(new BadRequestError("Invalid user ID"));
+  } else if (err.name === "DocumentNotFoundError") {
+    next(new NotFoundError("User not found"));
+  } else {
+    next(err);
+  }
+};
+
+// GET all users
+module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(200).send(users))
+    .then((users) => {
+      res.send(users);
+    })
     .catch(next);
 };
 
-const createUser = (req, res, next) => {
+// GET user by ID
+module.exports.getUser = (req, res, next) => {
+  User.findById(req.params.userId)
+    .orFail()
+    .then((user) => res.send(user))
+    .catch((err) => handleUserError(err, next));
+};
+
+// CREATE user
+module.exports.createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
-  if (!email || !password) {
-    return next(new BadRequestError("Email and password are required"));
-  }
-
-  return bcrypt
+  bcrypt
     .hash(password, 10)
-    .then((hash) => User.create({ name, avatar, email, password: hash }))
+    .then((hash) =>
+      User.create({
+        name,
+        avatar,
+        email,
+        password: hash,
+      })
+    )
     .then((user) => {
-      const userObj = user.toObject();
-      delete userObj.password;
-      return res.status(201).send(userObj);
+      res.status(201).send({
+        _id: user._id,
+        name: user.name,
+        avatar: user.avatar,
+        email: user.email,
+      });
     })
-    .catch((err) => {
-      if (err.code === 11000) {
-        next(new ConflictError("User with this email already exists"));
-      } else if (err.name === "ValidationError") {
-        next(new BadRequestError(err.message));
-      } else {
-        next(err);
-      }
-    });
+    .catch((err) => handleUserError(err, next));
 };
 
-const getUser = (req, res, next) => {
-  const { userId } = req.params;
-
-  User.findById(userId)
-    .orFail()
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BadRequestError("The id string is in an invalid format"));
-      } else if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("User not found"));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const getCurrentUser = (req, res, next) => {
-  const userId = req.user && req.user._id;
-
-  if (!userId) {
-    return next(new UnauthorizedError("Authorization required"));
-  }
-
-  return User.findById(userId)
-    .orFail()
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("User not found"));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const updateCurrentUser = (req, res, next) => {
-  const userId = req.user && req.user._id;
-  const { name, avatar } = req.body;
-
-  if (!userId) {
-    return next(new UnauthorizedError("Authorization required"));
-  }
-
-  return User.findByIdAndUpdate(
-    userId,
-    { name, avatar },
-    { new: true, runValidators: true }
-  )
-    .orFail()
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        next(new BadRequestError(err.message));
-      } else if (err.name === "DocumentNotFoundError") {
-        next(new NotFoundError("User not found"));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const login = (req, res, next) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return next(new BadRequestError("Email and password are required"));
   }
 
-  return User.findUserByCredentials(email, password)
+  return User.findOne({ email })
+    .select("+password")
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: "7d",
+      if (!user) {
+        throw new UnauthorizedError("Incorrect email or password");
+      }
+
+      return bcrypt.compare(password, user.password).then((matched) => {
+        if (!matched) {
+          throw new UnauthorizedError("Incorrect email or password");
+        }
+
+        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+          expiresIn: "7d",
+        });
+
+        return res.send({ token });
       });
-      return res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError("Incorrect email or password"));
-    });
+    .catch(next);
 };
 
-module.exports = {
-  getUsers,
-  createUser,
-  getUser,
-  getCurrentUser,
-  updateCurrentUser,
-  login,
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .orFail()
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => handleUserError(err, next));
+};
+
+module.exports.updateCurrentUser = (req, res, next) => {
+  const { name, avatar } = req.body;
+
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name, avatar },
+    {
+      new: true,
+      runValidators: true,
+    }
+  )
+    .orFail()
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => handleUserError(err, next));
 };
